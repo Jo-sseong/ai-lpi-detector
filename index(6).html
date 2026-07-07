@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>On-Device AI-Based Spectrum Sensing System for Real-Time Detection of Low-Power Frequency-Hopping Signals</title>
+  <style>
+    body {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 36px 18px 72px;
+      font-family: Arial, Helvetica, "Noto Sans KR", sans-serif;
+      font-size: 15px;
+      line-height: 1.58;
+      color: #111;
+      background: #fff;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    h2 {
+      margin: 30px 0 10px;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    h3 {
+      margin: 20px 0 6px;
+      font-size: 16px;
+    }
+
+    p {
+      margin: 8px 0;
+    }
+
+    a {
+      color: #0645ad;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    hr {
+      border: 0;
+      border-top: 1px solid #aaa;
+      margin: 24px 0;
+    }
+
+    .meta {
+      margin: 4px 0;
+      color: #333;
+    }
+
+    .links {
+      margin-top: 12px;
+    }
+
+    .links a {
+      margin-right: 8px;
+      white-space: nowrap;
+    }
+
+    figure {
+      margin: 20px 0 14px;
+      text-align: center;
+    }
+
+    figure img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto;
+    }
+
+    figcaption {
+      margin-top: 6px;
+      font-size: 13px;
+      color: #444;
+    }
+
+    .narrow img {
+      max-width: 760px;
+    }
+
+    .small {
+      font-size: 13px;
+      color: #555;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 24px 14px 56px;
+      }
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>On-Device AI-Based Spectrum Sensing System for Real-Time Detection of Low-Power Frequency-Hopping Signals</h1>
+  <p class="meta">조성환, 최범영 · ACE Lab, 국립한밭대학교</p>
+  <p class="meta">지도교수: 정의림</p>
+  <p class="links">
+    <a href="https://github.com/Jo-sseong/AI-Spectrum-Sensing-LPI-Detector">GitHub</a> /
+    <a href="https://d2j16w31g89z0j.cloudfront.net/site/2026w/abs/0867-ZRFQI.pdf">Paper</a> /
+    <a href="https://youtu.be/VMXERdvfJ80?si=uXlyPM0fmPjn3rhp">Demo Video 1</a> /
+    <a href="https://youtu.be/O74QrTFrt00?si=IwmjsKMl51plVzkS">Demo Video 2</a>
+  </p>
+
+  <figure class="narrow">
+    <img src="assets/system_pipeline.png" alt="제안 시스템의 학습 및 온디바이스 추론 파이프라인" />
+    <figcaption>그림 1. 제안하는 인공지능 스펙트럼 센싱 파이프라인</figcaption>
+  </figure>
+
+  <hr />
+
+  <h2>요약</h2>
+  <p>
+    근래 전장 환경에서 소형 공격 드론, 배회탄약, 저고도 무인기와 같이 기존 감시 체계로 안정적인 탐지가 어려운 표적의 활용이 증가하고 있다.
+    이러한 표적은 저전력 송신, 주파수 도약, 짧은 송신 시간 등을 활용한 저피탐(Low Probability of Intercept, LPI) 통신 방식을 사용할 수 있으며, 이에 따라 저피탐 통신 신호에 대한 조기 탐지 기술의 필요성이 커지고 있다.
+  </p>
+  <p>
+    그러나 저피탐 통신 신호는 신호 세기를 기반으로 판단하는 에너지 검출 기반 스펙트럼 센싱 기법만으로는 낮은 SNR 환경에서 신뢰성 있는 탐지가 어렵고, 신호의 정확한 시간-주파수 위치를 파악하기 어렵다.
+    이를 보완하기 위해 인공지능 기반 탐지 기법이 활용되고 있으나, 실제 전장 환경에서는 외부 서버와의 안정적인 연결을 보장하기 어렵다.
+  </p>
+  <p>
+    이에 본 논문에서는 스펙트로그램 상에서 저피탐 통신 신호의 시간-주파수 위치를 검출하는 것을 객체 탐지 문제로 정의하고, YOLOv8n 기반 실시간 온디바이스 스펙트럼 센싱 시스템을 제안한다.
+  </p>
+
+  <hr />
+
+  <h2>연구 배경</h2>
+  <p>
+    최근 전장 환경에서 저고도·저속 비행체의 활용이 급증하고 있다.
+    이러한 표적은 기존 감시 체계로 안정적인 탐지가 어렵고, 이에 따라 조기 탐지 체계의 필요성이 커지고 있다.
+  </p>
+
+  <figure>
+    <img src="assets/low_altitude_vehicle_battlefield.gif" alt="최근 전장에서 활용되는 저고도 저속 비행체의 사례" />
+    <figcaption>그림 2. 최근 전장에서 활용되는 저고도·저속 비행체의 사례</figcaption>
+  </figure>
+
+  <p>
+    이러한 무기 체계는 레이더 반사면적이 작아 레이더 기반 탐지가 어렵다는 한계를 가진다.
+    이에 따라 표적 자체를 탐지하는 방식보다, 표적과 조종자 간의 무선 통신 신호를 탐지하는 접근이 효과적인 대안으로 주목받고 있다.
+  </p>
+
+  <figure>
+    <img src="assets/radar_vs_rf_detection.png" alt="레이더 기반 탐지와 무선 신호 탐지 개념" />
+    <figcaption>그림 3. 표적 자체 탐지와 무선 통신 신호 탐지 접근</figcaption>
+  </figure>
+
+  <p>
+    그러나 저피탐 통신 신호는 빠른 주파수 호핑과 저전력 송신을 활용하여 무선 신호 노출을 최소화한다.
+    이로 인해 기존 에너지 탐지 기반 스펙트럼 센싱 기법은 낮은 SNR 환경에서 탐지 성능이 급격히 저하될 수 있다.
+  </p>
+
+  <figure>
+    <img src="assets/lpi_frequency_hopping_problem.png" alt="저전력 주파수 호핑 신호의 탐지 문제" />
+    <figcaption>그림 4. 저전력 송신과 주파수 호핑에 의한 탐지 회피</figcaption>
+  </figure>
+
+  <hr />
+
+  <h2>목표</h2>
+  <p>저전력 주파수 호핑 신호를 실시간으로 탐지한다.</p>
+  <p>신호의 존재 여부와 시간-주파수 영역에서의 위치를 함께 추정한다.</p>
+  <p>외부 서버 연결 없이 온디바이스 환경에서 전체 추론 과정을 수행한다.</p>
+  <p>탐지 결과를 실시간으로 시각화한다.</p>
+
+  <figure>
+    <img src="assets/on_device_requirement.jpg" alt="온디바이스 탐지기 요구사항" />
+    <figcaption>그림 5. 외부 서버에 의존하지 않는 온디바이스 탐지 시나리오</figcaption>
+  </figure>
+
+  <hr />
+
+  <h2>제안 방법</h2>
+  <p>
+    제안 시스템은 시뮬레이션 기반 학습 단계와 실시간 온디바이스 추론 단계로 구성된다.
+    학습 단계에서는 주파수 호핑 신호를 FFT 기반 스펙트로그램으로 변환하고, 신호 구간을 bounding box로 라벨링하여 YOLOv8n 객체 탐지 모델을 학습한다.
+  </p>
+
+  <figure>
+    <img src="assets/spectrogram_generation_examples.png" alt="신호 존재 여부에 따른 스펙트로그램 예시" />
+    <figcaption>그림 6. 학습에 사용한 스펙트로그램 이미지 예시</figcaption>
+  </figure>
+
+  <p>
+    추론 단계에서는 SDR로 수신한 실제 RF 신호를 스펙트로그램으로 변환한 뒤, 경량화된 ONNX 포맷의 YOLOv8n 모델에 입력한다.
+    모든 추론 과정은 Raspberry Pi 환경에서 수행되며, 탐지 결과는 Flask 기반 대시보드를 통해 실시간으로 시각화한다.
+  </p>
+
+  <hr />
+
+  <h2>실험 결과</h2>
+
+  <h3>정량적 성능 평가</h3>
+  <p>
+    아래 그래프는 SNR 조건에 따른 시뮬레이션 환경에서의 주파수 탐지 성능을 나타낸다.
+    SNR이 높아짐에 따라 탐지 성능이 향상되는 경향을 보이며, 낮은 SNR 환경에서도 비교적 안정적인 성능을 유지함을 확인할 수 있다.
+  </p>
+  <p>
+    특히 제안한 모델은 IoU 0.9 기준에서 SNR -3 dB 환경에서도 약 97.8%의 탐지 정확도를 달성하였다.
+    이는 기존 에너지 탐지 기반 스펙트럼 센싱 기법으로는 신뢰성 있는 탐지가 어려운 SNR 구간에서도 신호의 주파수 위치를 효과적으로 식별할 수 있음을 보여준다.
+  </p>
+
+  <figure>
+    <img src="assets/quantitative_detection_curve.png" alt="SNR 조건에 따른 제안 모델의 정량적 탐지 성능 그래프" />
+    <figcaption>그림 7. SNR 조건에 따른 제안 모델의 정량적 탐지 성능</figcaption>
+  </figure>
+
+  <h3>정성적 성능 평가</h3>
+  <p>
+    실제 환경에서의 성능을 평가하기 위해 상용 스펙트럼 분석기와 제안 시스템의 탐지 결과를 비교하였다.
+    상용 장비에서 신호 에너지가 잡음 바닥과 유사하여 육안 식별이 어려운 반면, 제안 시스템은 호핑 신호를 탐지하고 그 위치를 bounding box로 시각화한다.
+  </p>
+
+  <figure>
+    <img src="assets/qualitative_detection_snr_minus5.png" alt="SNR -5 dB 환경에서의 정성적 탐지 결과" />
+    <figcaption>그림 8. SNR -5 dB 환경에서의 정성적 탐지 결과</figcaption>
+  </figure>
+
+  <hr />
+
+  <h2>실제 환경 실험</h2>
+  <p>
+    실제 환경에서는 Signal Generator로 주파수 호핑 신호를 낮은 전력으로 송출하고, Spectrum Analyzer와 제안 시스템을 동일한 수신 위치에 배치하였다.
+    이를 통해 Analyzer가 신호를 확인할 수 있는 조건과, Analyzer상에서 신호 확인이 어려운 저피탐 조건을 비교하였다.
+  </p>
+
+  <figure>
+    <img src="assets/experiment_setup_real_world.png" alt="실제 환경 실험 구성" />
+    <figcaption>그림 9. 실제 환경 실험 구성</figcaption>
+  </figure>
+
+  <figure>
+    <img src="assets/our_device_real_world.png" alt="실제 실험 환경의 제안 탐지기" />
+    <figcaption>그림 10. Spectrum Analyzer 인근에 배치한 제안 온디바이스 탐지기</figcaption>
+  </figure>
+
+  <hr />
+
+  <h2>시연 영상</h2>
+  <p>
+    시연은 두 가지 시나리오로 구성된다.
+    첫 번째는 Analyzer상에서 신호가 보이는 경우이며, 두 번째는 Analyzer상에서 신호가 보이지 않는 저피탐 조건에서 제안 시스템이 신호를 탐지하는 경우이다.
+  </p>
+  <p>
+    <a href="https://youtu.be/VMXERdvfJ80?si=uXlyPM0fmPjn3rhp">Scenario 1: Analyzer visible</a> /
+    <a href="https://youtu.be/O74QrTFrt00?si=IwmjsKMl51plVzkS">Scenario 2: LPI condition</a>
+  </p>
+
+  <hr />
+
+  <p class="small">
+    조성환, 최범영 · 지도교수 정의림 · ACE Lab, 국립한밭대학교
+  </p>
+</body>
+</html>
